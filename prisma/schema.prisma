@@ -13,3 +13,51 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  password  String
+  role      Role         @default(MANAGER)
+  isActive  Boolean      @default(true)
+
+  // Relations
+  chatSessions ChatSession[]
+
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  title     String
+  user      User          @relation(fields: [userId], references: [id])
+  userId    String
+  messages  ChatMessage[]
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ChatMessage {
+  id          String       @id @default(cuid())
+  chatSession ChatSession  @relation(fields: [chatSessionId], references: [id])
+  chatSessionId String
+  role        MessageRole  // USER or ASSISTANT
+  content     String       // actual text
+  metadata    Json?        // optional: for tables, charts, API response etc.
+
+  createdAt   DateTime     @default(now())
+}
+
+enum Role {
+  MANAGER
+  ADMIN
+  SUPERADMIN
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
