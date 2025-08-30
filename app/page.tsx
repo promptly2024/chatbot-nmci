@@ -2,6 +2,7 @@
 
 import { signIn, signOut, useSession } from 'next-auth/react';
 import React from 'react'
+import { useRouter } from 'next/navigation';
 
 // Define the user type based on session.user structure
 type UserType = {
@@ -15,6 +16,7 @@ type UserType = {
 const HomePage = () => {
   const [user, setUser] = React.useState<UserType>(null);
   const { data: session, status } = useSession();
+  const router = useRouter();
   React.useEffect(() => {
     if (session) {
       setUser(session.user);
@@ -40,12 +42,20 @@ const HomePage = () => {
         <p className="text-red-500 mb-4">Please log in to see your details.</p>
       )}
       {status === 'authenticated' && (
-        <button
-          onClick={() => signOut()}
-          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded shadow transition mb-2"
-        >
-          Sign Out
-        </button>
+        <>
+          <button
+            onClick={() => signOut()}
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded shadow transition mb-2"
+          >
+            Sign Out
+          </button>
+          <button
+            onClick={() => router.push('/chat')}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded shadow transition mb-2"
+          >
+            Go to Chat
+          </button>
+        </>
       )}
       {status === 'unauthenticated' && (
         <button

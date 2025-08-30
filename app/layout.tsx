@@ -16,6 +16,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ChatBot NMCI",
   description: "Admin app to see dashboard, stats and analytics with chatbots",
+  openGraph: {
+    title: "ChatBot NMCI",
+    description: "Admin app to see dashboard, stats and analytics with chatbots",
+    url: "http://nmci.co.in/chatbot",
+    siteName: "ChatBot NMCI",
+    images: [
+      {
+        url: "http://nmci.co.in/wp-content/uploads/2023/01/NMCI-Logo-1.png",
+        width: 800,
+        height: 600,
+        alt: "ChatBot NMCI Logo",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

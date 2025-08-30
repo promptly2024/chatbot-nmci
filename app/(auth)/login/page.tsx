@@ -68,7 +68,7 @@ const Login = () => {
                 {/* Logo Placeholder */}
                 <div className="mb-6">
                     <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl font-bold text-gray-500">
-                        NMCI
+                        <img src="http://nmci.co.in/wp-content/uploads/2023/01/NMCI-Logo-1.png" alt="NMCI Logo" className="w-12 h-12" />
                     </div>
                 </div>
                 <h1 className="text-2xl font-semibold mb-2 text-gray-800">Login</h1>
