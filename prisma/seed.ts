@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 // To Run this seed file use this command: ts-node prisma/seed.ts or npx prisma db seed
 
-const { PrismaClient } = require("../app/generated/prisma");
+const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();
@@ -12,15 +12,22 @@ async function main() {
 
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const deleteChatMessages = await prisma.chatMessage.deleteMany({});
+    const deleteChatSessions = await prisma.chatSession.deleteMany({});
+    const deleteUser = await prisma.user.deleteMany({});
+    console.log("Deleted users:", deleteUser.count);
+    console.log("Deleted chat sessions:", deleteChatSessions.count);
+    console.log("Deleted chat messages:", deleteChatMessages.count);
     // create SuperAdmin if not exists
     const user = await prisma.user.upsert({
         where: { email },
         update: {},
         create: {
+            name: "Rohit Kumar Yadav",
             email,
             password: hashedPassword,
             role: "SUPERADMIN",
+            image: "https://avatars.githubusercontent.com/u/130658366?v=4",
             isActive: true,
         },
     });
