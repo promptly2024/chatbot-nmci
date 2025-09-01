@@ -10,15 +10,24 @@ interface DashboardLayoutProps {
 }
 
 const getChatSession = async () => {
-    const chatSessions = await prisma.chatSession.findMany();
+    const chatSessions = await prisma.chatSession.findMany({
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
     return chatSessions;
 };
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-    const chatSessions = await getChatSession();
+    const chatSessionsRaw = await getChatSession();
+    const chatSessions = chatSessionsRaw.map(session => ({
+        ...session,
+        createdAt: session.createdAt.toISOString(),
+        updatedAt: session.updatedAt.toISOString(),
+    }));
     return (
         <SidebarProvider>
-            < div className="flex min-h-screen w-full" >
+            <div className="flex min-h-screen w-full">
                 <AppSidebar chatSessions={chatSessions} />
                 <SidebarInset className="flex-1">
                     <DashboardHeader chatSessions={chatSessions} />

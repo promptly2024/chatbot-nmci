@@ -14,6 +14,7 @@ import {
     Mic,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Message {
     id: string;
@@ -27,15 +28,18 @@ interface Message {
 }
 
 interface ChatWindowProps {
-    chatroomId: string;
+    newChat: boolean;
+    chatroomId: string | null;
 }
 
-export default function ChatWindow({ chatroomId }: ChatWindowProps) {
+export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(chatroomId ? true : false);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const router = useRouter();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,6 +47,8 @@ export default function ChatWindow({ chatroomId }: ChatWindowProps) {
 
     const fetchMessages = async () => {
         try {
+            setLoading(true);
+            if (!chatroomId) return;
             const response = await fetch(`/api/chatrooms/messages/${chatroomId}`);
             const data = await response.json();
 
@@ -77,15 +83,20 @@ export default function ChatWindow({ chatroomId }: ChatWindowProps) {
         setNewMessage("");
 
         try {
-            const response = await fetch(`/api/chatrooms/messages/${chatroomId}`, {
+            const response = await fetch(`/api/chatrooms/messages/${chatroomId ?? "12345678"}`, {
                 method: "POST",
-                body: JSON.stringify({ content: messageContent }),
+                body: JSON.stringify({
+                    content: messageContent,
+                    newChat,
+                }),
             });
 
             const data = await response.json();
-
             if (response.ok) {
-                setMessages((prev) => [...prev, data.messages]);
+                if (newChat && data.chatSessionId) {
+                    router.push(`/chat/${data.chatSessionId}`);
+                }
+                setMessages((prev) => [...prev, data.messages, data.replyMessage]);
             } else {
                 toast.error(data.message || "Failed to send message");
                 setNewMessage(messageContent);

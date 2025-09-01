@@ -8,7 +8,7 @@ const ChatId = async ({ params }: { params: { id: string } }) => {
     const chatId = awaitedParams.id;
     return (
         // <div className='h-screen'>
-            <ChatWindow chatroomId={chatId} />
+            <ChatWindow newChat={false} chatroomId={chatId} />
         // </div>
     )
 }

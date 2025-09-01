@@ -11,6 +11,7 @@ import {
     Trash2,
     Archive,
     Edit,
+    Search,
 } from 'lucide-react';
 
 import {
@@ -46,7 +47,6 @@ import { signOut, useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 interface ChatSession {
     id: string;
@@ -79,6 +79,17 @@ export function AppSidebar({ chatSessions }: { chatSessions: ChatSession[] }) {
         }
     };
 
+    useEffect(() => {
+        chatSessions.map((session) => {
+            router.prefetch(`/chat/${session.id}`);
+        });
+    }, [chatSessions, router]);
+
+    const handleSearch = () => {
+        // Implement your search logic here
+        toast.info('Search button clicked');
+    };
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -102,7 +113,25 @@ export function AppSidebar({ chatSessions }: { chatSessions: ChatSession[] }) {
             </SidebarHeader>
 
             <Separator className="my-2" />
-
+            {/* New Chat Button */}
+            <div className="px-4 py-2">
+                <div className="w-full flex items-center gap-2">
+                    <button
+                        className="flex flex-1 items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:cursor-pointer bg-tertiary/90 transition"
+                        onClick={() => router.push('/chat')}
+                    >
+                        <MessageSquare />
+                        <span>New Chat</span>
+                    </button>
+                    <button
+                        className="flex items-center px-2 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-tertiary/80 transition ml-2"
+                        onClick={handleSearch}
+                        aria-label="Search"
+                    >
+                        <Search />
+                    </button>
+                </div>
+            </div>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Chat History</SidebarGroupLabel>
@@ -112,7 +141,8 @@ export function AppSidebar({ chatSessions }: { chatSessions: ChatSession[] }) {
                                 <SidebarMenuItem key={item.id}>
                                     <SidebarMenuButton asChild isActive={pathname === `/chat/${item.id}`}>
                                         <div>
-                                            <a href={`/chat/${item.id}`}>
+                                            <a href={`/chat/${item.id}`}
+                                                className='flex items-center gap-2 p-2 hover:bg-muted cursor-pointer'>
                                                 <span>{item.title}</span>
                                             </a>
                                             {/* ... 3 dots for secondary actions like delete , archive edit */}
