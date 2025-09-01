@@ -91,7 +91,7 @@ export default function ChatWindow({ chatroomId }: ChatWindowProps) {
                 setNewMessage(messageContent);
             }
         } catch (error) {
-            toast.error("An error occurred while sending message");
+            // toast.error("An error occurred while sending message");
             setNewMessage(messageContent);
         }
     };
