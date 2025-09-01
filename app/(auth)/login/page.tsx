@@ -30,9 +30,9 @@ const Login = () => {
                 });
                 setSuccess('Sign in successful');
                 if (result.ok) {
-                    router.push(`/${'dashboard'}`);
+                    router.push(`/`);
                     toast('Log in successful', {
-                        description: `Redirecting to ${'dashboard'}...`,
+                        description: `Redirecting to...`,
                         duration: 5000,
                     });
                 } else {
