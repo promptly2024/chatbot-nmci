@@ -60,26 +60,37 @@ export async function POST(request: NextRequest) {
                 message: msg.content,
             }));
         }
-
         const prompt = `
-        You are a helpful assistant for NMCI Business group, The admin will use you to know about various aspects of the business. First, classify the user message into one of these types:
-            1. greeting (any general queries a user might have)
-            2. data_query (means the user is asking something which I need to curate from my DB, related to my business like stats, user information, etc.)
-            3. other (any other type of query unrelated to My business, but they want to ask it from AI, so it's upon you, if you have that knowledge or information then sure give them.)
+You are a helpful assistant for NMCI Business group. Your task is to classify a user's message into one of three types and respond appropriately.
 
-        User message: "${content}"
-        ${context.length > 0 ? `Context (last 6 messages of the chatroom): ${JSON.stringify(context)}` : ""}
+Classification rules:
+1. greeting: general queries or salutations. Provide a polite reply.
+2. data_query: questions that require fetching info from our database (e.g., stats, user info). In this case, set "reply" to an empty string.
+3. other: unrelated queries; respond if you have knowledge.
 
-        If it is a greeting or other, respond politely, if data_query (means the user is asking something which i need to curate from my DB, related to my business like stats, user information, etc.) then only intent and reply will be empty string.
+Requirements for response:
+- Respond only in JSON.
+- JSON must have these keys: 
+  "intent": string ("greeting", "data_query", or "other")
+  "reply": string (empty if intent is "data_query")
+  "title": string (short title describing the conversation)
+- Use double quotes around all keys and string values.
+- Do not add extra text, code blocks, or explanations.
 
-        Respond only in JSON format like:{  "intent": "greeting",  "reply": "Hello! How can I help you today?, "  "title": "Chat Title that best suits this chat"}
-        The response should include all three fields: intent, reply, and title in JSON format starting with "{" and ending with "}"`;
+User message: "${content}"
+${context.length > 0 ? `Context (last 6 messages): ${JSON.stringify(context)}` : ""}
+
+Example of correct output:
+{
+  "intent": "greeting",
+  "reply": "Hello! How can I help you today?",
+  "title": "User Greeting"
+}
+`;
+
         const response = await generateGeminiResponse(prompt);
-        console.log("\n\nGemini Response:", response);
-
         const text = response.trim().replace(/```json/g, "").replace(/```/g, "").trim();
 
-        // 2. Parse JSON safely
         let geminiData: GeminiResponse;
         try {
             geminiData = JSON.parse(text);
@@ -88,6 +99,7 @@ export async function POST(request: NextRequest) {
             geminiData = { intent: "other", reply: text, title: "" }; // fallback
         }
         const { intent, reply, title } = geminiData;
+
         let newId;
         if (newChat) {
             const chatSession = await prisma.chatSession.create({
