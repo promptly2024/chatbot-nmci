@@ -69,9 +69,10 @@ const Login = () => {
             </div>
             <button
                 onClick={handleLogin}
+                disabled={loading}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md"
             >
-                Login
+                {loading ? 'Logging in...' : 'Login'}
             </button>
             <div className="mt-6">
                 <h2 className="text-xl font-bold mb-2">Response:</h2>
