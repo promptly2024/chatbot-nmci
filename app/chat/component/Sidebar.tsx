@@ -3,14 +3,10 @@
 
 import {
     ChevronDown,
-    Home,
     LogOut,
     Settings,
     MessageSquare,
     User,
-    Trash2,
-    Archive,
-    Edit,
     Search,
 } from 'lucide-react';
 

@@ -5,13 +5,10 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-type UserRole = "admin" | "manager" | "superadmin"
-
 interface User {
   id: string
   name: string
   email: string
-  role: UserRole
 }
 
 export default function SuperAdminDashboard() {
@@ -207,7 +204,7 @@ export default function SuperAdminDashboard() {
                     className="flex justify-between items-center border p-3 rounded"
                   >
                     <div>
-                      <p className="font-semibold">{user.name} ({user.role})</p>
+                      <p className="font-semibold">{user.name}</p>
                       <p className="text-sm text-gray-600">{user.email}</p>
                     </div>
                     <button

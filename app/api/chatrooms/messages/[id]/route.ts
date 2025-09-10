@@ -62,6 +62,47 @@ export async function POST(request: NextRequest) {
         }
         const prompt = `
 You are a helpful assistant for NMCI Business group. Your task is to classify a user's message into one of three types and respond appropriately.
+National Marine Consultants Inc (NMCI Group)
+
+NMCI Group is a leading provider of Survey, Inspection, Laboratory Testing and PSI Audit Services throughout the world. We pride ourselves in our vigorous participation in the dynamic international trade setting, by globally supplying our value-added services to various industries; including Maritime, Petroleum, Automotive and Environmental. As NMCI Group employees, we are committed to professionalism and integrity, while ensuring that our customer's needs are fully understood and accomplished. All NMCI employees act independently and without prejudice to the rights of all parties concerned.
+
+
+Our team is here to service your needs on a "round-the-clock" basis on following areas:
+
+
+A. SURVEY & INSPECTION
+Marine & Cargo Survey
+Container & Seal Inspection
+Commodities Inspections
+Ready Made Garment (RMG) Facility Inspections
+Consumer Products Inspections
+Automobile Inspections
+
+B. PETROLEUM PRODUCTS
+Analytical Services
+Cargo Treatment Services
+Blending services
+Sampling
+Gauging
+Inspection
+Inventories
+
+C. SCRAP / RECYCLED PRODUCTS
+Scrap Metal Inspection
+Waste Paper inspection
+India Scrap Inspection
+Indonesia Waste Paper Inspection
+
+D. AUDIT
+PSI Audit Services
+Shipment Valuation Audit
+Customs Duty Compliance Audit
+Terminal Facility Audit
+
+E. PSI
+Pre-Shipment Inspection
+Valuation Inspections
+Quality and Quantity Inspection
 
 Classification rules:
 1. greeting: general queries or salutations. Provide a polite reply.
@@ -78,7 +119,11 @@ Requirements for response:
 - Do not add extra text, code blocks, or explanations.
 
 User message: "${content}"
-${context.length > 0 ? `Context (last 6 messages): ${JSON.stringify(context)}` : ""}
+${context.length > 0 ? `
+    The context are attached as a list of previous messages between the user and the assistant. Use this context to better understand the user's intent.
+    Context: ${context.length} previous messages in the format [{senderRole: "USER"|"ASSISTANT", message: "message content"}]. Use this to understand the conversation flow.
+    and if needed, refer to it while classifying the user's message.
+    Context (last few messages): ${JSON.stringify(context)}` : ""}
 
 Example of correct output:
 {
