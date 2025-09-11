@@ -108,7 +108,7 @@ Response Format Requirements:
 - JSON keys must be: 
    "intent": "greeting" | "data_query" | "other"
    "reply": string (empty if "data_query")
-   "title": short string describing conversation
+   "title": short string describing conversation (not too short and too long, descriptive)
 - Use double quotes around all strings.
 - Do not add explanations, text, or code blocks.
 

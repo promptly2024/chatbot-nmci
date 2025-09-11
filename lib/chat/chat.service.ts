@@ -65,10 +65,8 @@ export const ChatService = {
             // For now, we'll just log the selected API data.
             if (apiData) {
                 console.log("\n\nSelected API Data:", apiData);
-                replyContent = `I have identified the appropriate API to call based on your query:\n\n` +
-                    `${JSON.stringify(apiData, null, 2)}\n\n` +
-                    `Please proceed to call this API to retrieve the necessary information.`;
-                
+                replyContent = `${JSON.stringify(apiData, null, 2)}`;
+
                 // Call the API here
             } else {
                 console.log("No valid API data extracted.");
