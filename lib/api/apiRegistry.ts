@@ -10,6 +10,7 @@ export const API_REGISTRY = [
         pathParams: ["userId"],
         headers: ["Authorization"],
     },
+    
     {
         name: "getChatMessages",
         description: "Fetches messages for a given chat session",

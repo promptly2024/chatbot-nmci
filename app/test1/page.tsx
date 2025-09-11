@@ -33,7 +33,7 @@ export default function Home() {
         }
         toast.info('Calling API...');
         try {
-            const res = await fetch('https://be.letstranzact.com/settings/product/get-products/product_type=Both', {
+            const res = await fetch('https://be.letstranzact.com/settings/product/get-products?product_type=Both', {
             // const res = await fetch('https://be.letstranzact.com/settings/product/get-products/?product_name=Raw Material&itemid=RM01&product_type=Both', {
                 method: 'GET',
                 headers: {

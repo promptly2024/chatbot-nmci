@@ -2,7 +2,7 @@
 import { generateGeminiResponse } from "@/utils/generateGeminiResponse";
 import { ChatRepository } from "./chat.repository";
 import { GeminiResponse } from "@/app/api/chatrooms/route";
-import { buildClassificationPrompt } from "../prompt";
+import { buildApiSelectionPrompt, buildClassificationPrompt } from "../prompt";
 
 export const ChatService = {
     async fetchMessages(chatSessionId: string) {
@@ -31,9 +31,51 @@ export const ChatService = {
         }
         const { intent, reply, title } = geminiData;
         console.log('\n\nThe Gemini reply:\n\nIntent:', intent, '\nReply:', reply, '\nTitle:', title, '\n\n');
+
+        let replyContent = geminiData.reply ||
+            (geminiData.intent === "data_query"
+                ? "This is a data query, and I need more information to assist you."
+                : "I'm here to help with any questions you have.");
+
         if (intent === "data_query") {
             console.log("Data query detected. Further processing can be implemented here.");
+            const apiSelection = await generateGeminiResponse(
+                buildApiSelectionPrompt(content, context)
+            );
+            console.log("API Selection Response:", apiSelection);
+
+            // again trim the response
+            const apiText = apiSelection.trim().replace(/```json/g, "").replace(/```/g, "").trim();
+            let apiData: {
+                name: string;
+                method: string;
+                endpoint: string;
+                pathParams: Record<string, string>;
+                queryParams: Record<string, string>;
+                body: string | null;
+            } | null = null;
+            try {
+                apiData = JSON.parse(apiText);
+                console.log("Parsed API Data:", apiData);
+            } catch (err) {
+                console.error("Failed to parse API selection response:", err, apiText);
+                apiData = null;
+            }
+            // Here, you would typically call the selected API and get the actual data.
+            // For now, we'll just log the selected API data.
+            if (apiData) {
+                console.log("\n\nSelected API Data:", apiData);
+                replyContent = `I have identified the appropriate API to call based on your query:\n\n` +
+                    `${JSON.stringify(apiData, null, 2)}\n\n` +
+                    `Please proceed to call this API to retrieve the necessary information.`;
+                
+                // Call the API here
+            } else {
+                console.log("No valid API data extracted.");
+                replyContent = "(Note: Unable to determine the appropriate API to call.)\n\nPlease provide more details.";
+            }
         }
+
         let sessionId = chatSessionId;
         if (newChat) {
             const newSession = await ChatRepository.createChatSession(
@@ -44,11 +86,6 @@ export const ChatService = {
         }
 
         const messages = await ChatRepository.createMessage({ content, chatSessionId: sessionId!, role: "USER" });
-
-        const replyContent = geminiData.reply ||
-            (geminiData.intent === "data_query"
-                ? "This is a data query, and I need more information to assist you."
-                : "I'm here to help with any questions you have.");
 
         const replyMessage = await ChatRepository.createMessage({
             content: replyContent,

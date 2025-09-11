@@ -95,6 +95,7 @@ const Login = () => {
 export default Login;
 
 /*
+Response Examples
 {
   "data": {
     "errors": {
@@ -116,6 +117,7 @@ export default Login;
   ]
 }
 
+Response Example 2 - when credentials are correct:
   Login Successful
 {
   "status": 1,
