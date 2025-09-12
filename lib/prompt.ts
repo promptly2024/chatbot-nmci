@@ -1,4 +1,42 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { API_REGISTRY } from "./api/apiRegistry";
+
+export function buildApiResponsePrompt(
+   userMessage: string,
+   apiSpec: any,
+   apiResponse: any
+) {
+   return `
+You are a helpful assistant for NMCI Business Group.
+
+The user originally asked:
+"${userMessage}"
+
+We selected the following API:
+${JSON.stringify(apiSpec, null, 2)}
+
+The API returned the following response:
+${JSON.stringify(apiResponse, null, 2)}
+
+Task:
+- Write a clear, professional, and helpful response to the user.
+- The reply can include insights, summaries, or key data points from the API response.
+- It can be very long if needed to fully answer the user's question.
+- If the user asked for specific data, provide that data clearly.
+- If the user asked for a summary or analysis, provide that.
+- If the user asked for recommendations or next steps, provide those.
+- Use information from the API response only.
+- If the API response is empty, unclear, or has missing fields, politely mention that data was not found or is unavailable.
+- Do NOT expose raw JSON, internal API names, or technical details.
+- Make the answer business-friendly and easy to understand.
+
+Response Format:
+{
+  "reply": string
+}
+`.trim();
+}
+
 
 export function buildApiSelectionPrompt(content: string, context: { senderRole: string; message: string }[] = []) {
     return `
@@ -23,6 +61,7 @@ Task:
 - Select the *single most relevant API* for this request.
 - Fill in parameters if possible from the user message and context.
 - If information is missing, leave parameter values empty ("").
+- If the API related to reporting, set isReportingApi to true because it uses a different base URL.
 - If no API matches, set api = null.
 
 Response Format:
@@ -30,6 +69,7 @@ Response Format:
   "name": string,
   "method": string,
   "endpoint": string,
+  "isReportingApi": boolean,
   "pathParams": { key: value },
   "queryParams": { key: value },
   "body": { ... }

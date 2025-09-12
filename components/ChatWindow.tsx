@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 interface Message {
     id: string;
@@ -204,7 +205,7 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                                         </p>
                                                     )}
                                                     <p className="text-sm break-words">
-                                                        {message.content}
+                                                        <MarkdownRenderer content={message.content} />
                                                     </p>
                                                     <div
                                                         className={`flex items-center justify-end gap-1 mt-1 ${isOwn

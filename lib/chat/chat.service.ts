@@ -3,6 +3,7 @@ import { generateGeminiResponse } from "@/utils/generateGeminiResponse";
 import { ChatRepository } from "./chat.repository";
 import { GeminiResponse } from "@/app/api/chatrooms/route";
 import { buildApiSelectionPrompt, buildClassificationPrompt } from "../prompt";
+import { ApiData, callApiFromRegistry } from "../api/callApiFromRegistry";
 
 export const ChatService = {
     async fetchMessages(chatSessionId: string) {
@@ -46,14 +47,16 @@ export const ChatService = {
 
             // again trim the response
             const apiText = apiSelection.trim().replace(/```json/g, "").replace(/```/g, "").trim();
-            let apiData: {
-                name: string;
-                method: string;
-                endpoint: string;
-                pathParams: Record<string, string>;
-                queryParams: Record<string, string>;
-                body: string | null;
-            } | null = null;
+            let apiData: ApiData | null = {
+                name: "",
+                method: "GET",
+                endpoint: "",
+                isReportingApi: false,
+                pathParams: {},
+                queryParams: {},
+                body: null
+            };
+
             try {
                 apiData = JSON.parse(apiText);
                 console.log("Parsed API Data:", apiData);
@@ -61,13 +64,11 @@ export const ChatService = {
                 console.error("Failed to parse API selection response:", err, apiText);
                 apiData = null;
             }
-            // Here, you would typically call the selected API and get the actual data.
-            // For now, we'll just log the selected API data.
+            
             if (apiData) {
                 console.log("\n\nSelected API Data:", apiData);
-                replyContent = `${JSON.stringify(apiData, null, 2)}`;
-
-                // Call the API here
+                replyContent = await callApiFromRegistry(apiData, content) as string;
+                console.log("API Call Reply Content:", replyContent);
             } else {
                 console.log("No valid API data extracted.");
                 replyContent = "(Note: Unable to determine the appropriate API to call.)\n\nPlease provide more details.";

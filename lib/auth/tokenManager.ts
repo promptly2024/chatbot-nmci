@@ -19,10 +19,12 @@ export async function getAccessToken(): Promise<string> {
 
     // If we have a valid cached token, reuse it
     if (cachedAccessToken && tokenExpiry && now < tokenExpiry - 30) {
+        console.log("\nReusing cached access token.");
         return cachedAccessToken;
     }
 
     // Otherwise, login again
+    console.log("\nFetching new access token by logging in.");
     return await loginAndCacheTokens();
 }
 
@@ -35,11 +37,13 @@ async function loginAndCacheTokens(): Promise<string> {
 
     if (!res.ok) {
         const text = await res.text().catch(() => "");
+        console.error("\n\nLogin Failed:", res.status, res.statusText, text);
         throw new Error(`Login failed: ${res.status} ${res.statusText} ${text}`);
     }
 
     const data = await res.json();
     if (data.status !== 1) {
+        console.error("\n\nLogin Failed:", JSON.stringify(data));
         throw new Error("Login failed: " + JSON.stringify(data));
     }
 
@@ -49,5 +53,6 @@ async function loginAndCacheTokens(): Promise<string> {
     // set expiry window manually
     tokenExpiry = Math.floor(Date.now() / 1000) + ACCESS_TOKEN_LIFETIME;
 
+    console.log("\nNew access token fetched and cached. Expires in 15 minutes.");
     return cachedAccessToken!;
 }

@@ -60,8 +60,9 @@ export const API_REGISTRY = [
                 },
                 "description": "Pagination and sorting configuration"
             },
-            "invoice_date_interval|invoice_from_date|invoice_to_date": {
+            "invoice_date_interval|invoice_from_date|invoice_to_date": { // can not be empty string
                 "type": "string",
+                // required: true, select only one from "invoice_date_interval", "invoice_from_date", "invoice_to_date"
                 "example": "Last 180 Days",
                 "description": "Invoice date filter interval",
                 "options": [
@@ -70,9 +71,10 @@ export const API_REGISTRY = [
                     "Custom"
                 ]
             },
-            "creation_date_interval|creation_start_date|creation_end_date": {
+            "creation_date_interval|creation_start_date|creation_end_date": { // can not be empty string
                 "type": "string",
-                "example": "Last 180 Days",
+                // required: true, select only one from "creation_date_interval", "creation_start_date", "creation_end_date"
+                "default": "Last 180 Days",
                 "description": "Creation date filter interval",
                 "options": [
                     "Last 180 Days",
@@ -80,13 +82,15 @@ export const API_REGISTRY = [
                     "Custom"
                 ]
             },
-            "payment_due_date_interval|payment_start_date|payment_end_date": {
+            "payment_due_date_interval|payment_start_date|payment_end_date": { // can not be empty string
                 "type": "string",
+                // required: true, select only one from "payment_due_date_interval", "payment_start_date", "payment_end_date"
                 "example": "All",
                 "description": "Payment due date filter interval"
             },
             "dispatch_details_status": {
                 "type": "string",
+                // required: true,
                 "example": "All",
                 "description": "Filter by dispatch details status"
             },
@@ -107,6 +111,7 @@ export const API_REGISTRY = [
             },
             "currency_type": {
                 "type": "string",
+                // required: true,
                 "example": "Rupee",
                 "description": "Currency type filter",
                 "options": [
@@ -118,6 +123,7 @@ export const API_REGISTRY = [
             "document_status": {
                 "type": "string",
                 "example": "All Sent",
+                // required: true,
                 "description": "Document status filter",
                 "options": [
                     "All Sent",
@@ -128,6 +134,7 @@ export const API_REGISTRY = [
             "invoice_payment_status": {
                 "type": "string",
                 "example": "All",
+                // required: true,
                 "description": "Invoice payment status filter",
                 "options": [
                     "All",
@@ -138,6 +145,7 @@ export const API_REGISTRY = [
             },
             "output": {
                 "type": "string",
+                // required: true,
                 "example": "display",
                 "description": "Output format type",
                 "options": [
