@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
         // Get the response data
         const data = await response.json();
-        
+
         if (!response.ok) {
             return NextResponse.json(
                 { error: `External API error: ${response.status} - ${response.statusText}`, details: data },
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         if (error instanceof Error) {
             message = error.message;
         }
-
+        console.error('Error message:', message);
         return NextResponse.json(
             { error: message },
             { status: 500 }
