@@ -1,5 +1,3 @@
-// lib/api/apiRegistry.ts
-
 export const API_REGISTRY = [
     {
         "name": "generateSalesInvoiceRegister",
