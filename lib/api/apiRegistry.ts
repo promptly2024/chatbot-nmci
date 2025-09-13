@@ -1,5 +1,6 @@
 export const API_REGISTRY = [
     {
+        // Prompt : Generates Sales Invoice Register (Item-wise) report with detailed invoice and item information for last 180 days and creation date is also last 180 days 
         "name": "generateSalesInvoiceRegister",
         "description": "Generates Sales Invoice Register (Item-wise) report with detailed invoice and item information",
         "method": "POST",
@@ -60,6 +61,7 @@ export const API_REGISTRY = [
             },
             "invoice_date_interval|invoice_from_date|invoice_to_date": {
                 "type": "string",
+                // required: true,
                 "example": "Last 180 Days",
                 "description": "Invoice date filter interval",
                 "options": [
@@ -70,6 +72,7 @@ export const API_REGISTRY = [
             },
             "creation_date_interval|creation_start_date|creation_end_date": {
                 "type": "string",
+                // required: true,
                 "example": "Last 180 Days",
                 "description": "Creation date filter interval",
                 "options": [
@@ -80,6 +83,7 @@ export const API_REGISTRY = [
             },
             "payment_due_date_interval|payment_start_date|payment_end_date": {
                 "type": "string",
+                // required: true,
                 "example": "All",
                 "description": "Payment due date filter interval"
             },
@@ -111,8 +115,13 @@ export const API_REGISTRY = [
                 "description": "Currency type filter",
                 "options": [
                     "Rupee",
-                    "Dollar",
-                    "Euro"
+                    "Rupee Export",
+                    "US Dollar",
+                    "Pound",
+                    "Euro",
+                    "Yen",
+                    "Rest",
+                    "All"
                 ]
             },
             "document_status": {
@@ -121,9 +130,10 @@ export const API_REGISTRY = [
                 // required: true,
                 "description": "Document status filter",
                 "options": [
-                    "All Sent",
+                    "All",
                     "Draft",
-                    "Cancelled"
+                    "Cancelled",
+                    "All Sent"
                 ]
             },
             "invoice_payment_status": {
@@ -132,10 +142,10 @@ export const API_REGISTRY = [
                 // required: true,
                 "description": "Invoice payment status filter",
                 "options": [
-                    "All",
-                    "Paid",
-                    "Unpaid",
-                    "Partially Paid"
+                    "Fully Paid",
+                    "Pending",
+                    "Overdue",
+                    "All"
                 ]
             },
             "output": {
@@ -155,6 +165,7 @@ export const API_REGISTRY = [
         ]
     },
     {
+        // Prompt: "Generates Product Price and Inventory report with pricing details and stock information for product type sell"
         "name": "generateProductPriceAndInventoryReport",
         "description": "Generates Product Price and Inventory report with pricing details and stock information",
         "method": "POST",
@@ -190,7 +201,7 @@ export const API_REGISTRY = [
             "report": {
                 "type": "object",
                 "example": {
-                    "id": "9"
+                    "id": "9",
                 },
                 "description": "Report configuration object with report ID for Product Price and Inventory"
             },
@@ -219,10 +230,8 @@ export const API_REGISTRY = [
                 "description": "Filter by product type",
                 "options": [
                     "All",
-                    "Goods",
-                    "Service",
-                    "Raw Material",
-                    "Finished Goods"
+                    "Buy",
+                    "Sell"
                 ]
             },
             "inventory_date": {
@@ -246,9 +255,8 @@ export const API_REGISTRY = [
                 "description": "Pricing type filter",
                 "options": [
                     "Default Price",
-                    "Customer Specific",
-                    "Quantity Based",
-                    "Date Range"
+                    "Average Pricing",
+                    "FIFO"
                 ]
             },
             "stock_check": {
@@ -257,9 +265,9 @@ export const API_REGISTRY = [
                 "description": "Stock check filter for inventory status",
                 "options": [
                     "All (Default)",
-                    "In Stock",
-                    "Out of Stock",
-                    "Low Stock"
+                    "Less than Min Stock Level",
+                    "Greater than Max Stock Level",
+                    "Greater than Max or Less than Min Stock Level"
                 ]
             },
             "output": {
@@ -277,7 +285,8 @@ export const API_REGISTRY = [
             "Content-Type"
         ]
     },
-    {
+    {   
+        // Prompt: "Generates Sales Order Register (Item-wise) report with detailed order and item information the creation date is last 30 days and the delivery date is also last 30 days"
         "name": "generateSalesOrderRegisterItemwise",
         "description": "Generates Sales Order Register (Item-wise) report with detailed order and item information",
         "method": "POST",
@@ -377,9 +386,14 @@ export const API_REGISTRY = [
                 "example": "Rupee",
                 "description": "Currency type filter",
                 "options": [
-                    "Rupee",
-                    "Dollar",
-                    "Euro"
+                    "Rupee",  
+                    "Rupee Export",  
+                    "US Dollar",  
+                    "Pound",  
+                    "Euro",  
+                    "Yen",  
+                    "Rest",  
+                    "All"
                 ]
             },
             "item_type": {
@@ -399,7 +413,7 @@ export const API_REGISTRY = [
                 "options": [
                     "Overdue",
                     "Pending",
-                    "Paid",
+                    "Completed",
                     "All"
                 ]
             },
@@ -411,7 +425,7 @@ export const API_REGISTRY = [
                     "All Sent",
                     "Draft",
                     "Cancelled",
-                    "All"
+                    "All Sent"
                 ]
             },
             "show_alternate_uom": {
@@ -439,6 +453,7 @@ export const API_REGISTRY = [
         ]
     },
     {
+        // Prompt: "Generates Purchase Invoice Register (Item-wise) report with detailed purchase invoice and item information for last 30 days"
         "name": "generatePurchaseInvoiceRegisterItemwise",
         "description": "Generates Purchase Invoice Register (Item-wise) report with detailed purchase invoice and item information",
         "method": "POST",
@@ -533,9 +548,14 @@ export const API_REGISTRY = [
                 "example": "Rupee",
                 "description": "Currency type filter",
                 "options": [
-                    "Rupee",
-                    "Dollar",
-                    "Euro"
+                    "Rupee",  
+                    "Rupee Export",  
+                    "US Dollar",  
+                    "Pound",  
+                    "Euro",  
+                    "Yen",  
+                    "Rest",  
+                    "All"
                 ]
             },
             "invoice_payment_status": {
@@ -544,9 +564,8 @@ export const API_REGISTRY = [
                 "description": "Invoice payment status filter",
                 "options": [
                     "All",
-                    "Paid",
-                    "Unpaid",
-                    "Partially Paid",
+                    "Pending",
+                    "Fully Paid",
                     "Overdue"
                 ]
             },
@@ -582,6 +601,7 @@ export const API_REGISTRY = [
         ]
     },
     {
+        // Prompt: "Generates Inventory Movement/Batch Tracking report with detailed product movement, barcode, and batch information for last 30 days"
         "name": "generateInventoryMovementBatchReport",
         "description": "Generates Inventory Movement/Batch Tracking report with detailed product movement, barcode, and batch information",
         "method": "POST",
@@ -720,6 +740,7 @@ export const API_REGISTRY = [
         ]
     },
     {
+        // Prompt: "Generates Sales Quotation (Item-wise) report with detailed quotation and item information for sales prospects for last 30 days, the reply date is last 30 days and next action is all"
         "name": "generateSalesQuotationItemwise",
         "description": "Generates Sales Quotation (Item-wise) report with detailed quotation and item information for sales prospects",
         "method": "POST",
@@ -864,6 +885,7 @@ export const API_REGISTRY = [
         ]
     },
     {
+        // Prompt: "Generates Account Receivable report with detailed invoice data, payment status, and outstanding balances for last 7 days"
         "name": "generateAccountReceivableReport",
         "description": "Generates Account Receivable report with detailed invoice data, payment status, and outstanding balances",
         "method": "POST",

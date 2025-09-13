@@ -52,6 +52,11 @@ Task:
 - Fill in parameters if possible from the user message and context.
 - If information is missing, leave parameter values empty ("").
 - If no API matches, set api = null.
+- Preserve piped parameter names exactly as specified in the API definition.
+
+Parameter Handling Guidelines:
+- Keep piped parameter names intact (e.g., "creation_date_interval|creation_start_date|creation_end_date")
+- Pipe characters (|) in JSON object keys are valid JSON according to specification
 
 Response Format:
 We have the following API registry:
