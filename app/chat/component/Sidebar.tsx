@@ -114,7 +114,7 @@ export function AppSidebar({ chatSessions }: { chatSessions: ChatSession[] }) {
                 <div className="w-full flex items-center gap-2">
                     <button
                         className="flex flex-1 items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:cursor-pointer bg-tertiary/90 transition"
-                        onClick={() => router.push('/chat')}
+                        onClick={() => router.push('/chat?new=true&src=sidebar&datetime=' + new Date().toISOString())}
                     >
                         <MessageSquare />
                         <span>New Chat</span>
