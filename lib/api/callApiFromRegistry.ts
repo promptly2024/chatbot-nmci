@@ -72,7 +72,8 @@ export async function callApiFromRegistry(apiData: ApiData, content: string) {
             );
         }
         const data = await res.clone().json();
-        console.log("\n\nAPI Response Data:", JSON.stringify(data, null, 2));
+        // console.log("\n\nAPI Response Data:", JSON.stringify(data, null, 2));
+        return JSON.stringify(data, null, 2);
         const geminiFinalResponse = await generateGeminiResponse(buildApiResponsePrompt(content, apiData, data));
         const text = geminiFinalResponse.trim().replace(/```json/g, "").replace(/```/g, "").trim();
 
