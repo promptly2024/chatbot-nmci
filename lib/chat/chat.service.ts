@@ -3,7 +3,8 @@ import { generateGeminiResponse } from "@/utils/generateGeminiResponse";
 import { ChatRepository } from "./chat.repository";
 import { GeminiResponse } from "@/app/api/chatrooms/route";
 import { buildApiSelectionPrompt, buildClassificationPrompt } from "../prompt";
-import { ApiData, callApiFromRegistry } from "../api/callApiFromRegistry";
+import { ApiData, buildFinalResponse, callApiFromRegistry } from "../api/callApiFromRegistry";
+import { Metadata } from "@/types/metadata";
 
 export const ChatService = {
     async fetchMessages(chatSessionId: string) {
@@ -38,6 +39,8 @@ export const ChatService = {
                 ? "This is a data query, and I need more information to assist you."
                 : "I'm here to help with any questions you have.");
 
+        let metadata: Metadata | undefined = undefined; // Fix: initialize to undefined
+        let isMetadataPresent = false;
         if (intent === "data_query") {
             console.log("Data query detected. Further processing can be implemented here.");
             const apiSelection = await generateGeminiResponse(
@@ -64,11 +67,16 @@ export const ChatService = {
                 console.error("Failed to parse API selection response:", err, apiText);
                 apiData = null;
             }
-            
+
             if (apiData) {
                 console.log("\n\nSelected API Data:", apiData);
-                replyContent = await callApiFromRegistry(apiData, content) as string;
-                console.log("API Call Reply Content:", replyContent);
+                const apiResponse = await callApiFromRegistry(apiData, content) as string;
+                console.log("API Call Reply Content:", apiResponse);
+
+                const finalResponse: { reply: string, metadata: Metadata } = await buildFinalResponse(apiResponse, apiData, content);
+                replyContent = finalResponse.reply;
+                metadata = finalResponse.metadata;
+                isMetadataPresent = true;
             } else {
                 console.log("No valid API data extracted.");
                 replyContent = "(Note: Unable to determine the appropriate API to call.)\n\nPlease provide more details.";
@@ -90,8 +98,14 @@ export const ChatService = {
             content: replyContent,
             chatSessionId: sessionId!,
             role: "ASSISTANT",
+            metadata: isMetadataPresent && metadata ? metadata : { type: "none", data: {} }
         });
 
-        return { sessionId, messages, replyMessage };
+        return {
+            sessionId,
+            messages,
+            replyMessage,
+            metadata
+        };
     },
 };

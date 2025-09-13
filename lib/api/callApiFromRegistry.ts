@@ -1,6 +1,7 @@
 import { generateGeminiResponse } from "@/utils/generateGeminiResponse";
 import { getAccessToken } from "../auth/tokenManager";
 import { buildApiResponsePrompt } from "../prompt";
+import { Metadata } from "@/types/metadata";
 
 export type ApiData = {
     name: string;
@@ -74,19 +75,22 @@ export async function callApiFromRegistry(apiData: ApiData, content: string) {
         const data = await res.clone().json();
         // console.log("\n\nAPI Response Data:", JSON.stringify(data, null, 2));
         return JSON.stringify(data, null, 2);
-        const geminiFinalResponse = await generateGeminiResponse(buildApiResponsePrompt(content, apiData, data));
-        const text = geminiFinalResponse.trim().replace(/```json/g, "").replace(/```/g, "").trim();
-
-        let geminiData: { reply: string };
-        try {
-            geminiData = JSON.parse(text);
-        } catch (err) {
-            console.error("Failed to parse GEMINI response:", err, text);
-            geminiData = { reply: text };
-        }
-        return geminiData.reply || "No reply from API response.";
     } catch (error) {
         console.error("Error calling API:", error);
         throw error;
     }
+}
+
+export async function buildFinalResponse(apiResponse: string, apiData: ApiData, content: string) {
+    const geminiFinalResponse = await generateGeminiResponse(buildApiResponsePrompt(content, apiData, apiResponse));
+    const text = geminiFinalResponse.trim().replace(/```json/g, "").replace(/```/g, "").trim();
+
+    let geminiData: { reply: string, metadata: Metadata };
+    try {
+        geminiData = JSON.parse(text);
+    } catch (err) {
+        console.error("Failed to parse GEMINI response:", err, text);
+        geminiData = { reply: text, metadata: {} as Metadata };
+    }
+    return geminiData;
 }

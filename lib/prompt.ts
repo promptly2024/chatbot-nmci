@@ -19,27 +19,59 @@ The API returned the following response:
 ${JSON.stringify(apiResponse, null, 2)}
 
 Task:
-- Write a clear, professional, and helpful response to the user.
-- The reply can include insights, summaries, or key data points from the API response.
-- It can be very long if needed to fully answer the user's question.
-- If the user asked for specific data, provide that data clearly.
-- If the user asked for a summary or analysis, provide that.
-- If the user asked for recommendations or next steps, provide those.
-- Use information from the API response only.
-- If the API response is empty, unclear, or has missing fields, politely mention that data was not found or is unavailable.
-- Do NOT expose raw JSON, internal API names, or technical details.
-- Make the answer business-friendly and easy to understand.
+1. Write a clear, professional, and helpful response to the user based *only* on the API response:
+   - Write a clear, professional, and helpful response to the user.
+   - The reply can include insights, summaries, or key data points from the API response.
+   - It can be very long if needed to fully answer the user's question.
+   - If the user asked for specific data, provide that data clearly.
+   - If the user asked for a summary or analysis, provide that.
+   - If the user asked for recommendations or next steps, provide those.
+   - Use information from the API response only.
+   - If the API response is empty, unclear, or has missing fields, politely mention that data was not found or is unavailable.
+   - Do NOT expose raw JSON, internal API names, or technical details.
+   - Make the answer business-friendly and easy to understand.
 
-Response Format:
+2. Also generate metadata that strictly follows the schema below, so the frontend can render it directly.
+   - If the API response does not contain structured data, set type to "none" and leave data empty.
+   - If the API response contains tabular data, set type to "table" and fill in headers and rows.
+   - If the API response contains numerical data suitable for charts, choose the best chart type (bar, line, pie) and fill in items.
+   - If the API response contains key metrics, set type to "kpi" and fill in kpis with label, value, unit (if any), and trend (if known).
+   - If unsure about the best visualization, choose "none".
+   - Ensure the metadata is accurate and matches the API response data.
+   - Metadata is optional, your best focus should be on writing a great reply to the user.
+
+Metadata Schema (constant across all responses):
 {
-  "reply": string
+  "type": "table" | "bar" | "line" | "pie" | "kpi" | "none",
+  "title": string (optional),
+  "description": string (optional),
+  "data": {
+    "headers"?: string[],          // for tables
+    "rows"?: any[][],              // for tables
+    "items"?: {                    // for charts
+      "label": string,
+      "value": number
+    }[],
+    "kpis"?: {                     // for KPI metrics
+      "label": string,
+      "value": number | string,
+      "unit"?: string,
+      "trend"?: "up" | "down" | "neutral"
+    }[]
+  }
+}
+
+Response Format (must be valid JSON):
+{
+  "reply": string,
+  "metadata": Metadata
 }
 `.trim();
 }
 
 
 export function buildApiSelectionPrompt(content: string, context: { senderRole: string; message: string }[] = []) {
-    return `
+   return `
 You are an assistant for NMCI Business Group.
 
 The user asked: "${content}"
@@ -127,16 +159,16 @@ E. PSI
 `;
 
 export function buildClassificationPrompt(content: string, context: { senderRole: string; message: string }[] = []) {
-    const contextSection = context.length
-        ? `
+   const contextSection = context.length
+      ? `
 Conversation Context:
 - Total previous messages: ${context.length}
 - Format: [{senderRole: "USER"|"ASSISTANT", message: "content"}]
 - Use context only if it helps disambiguate intent.
 Last few messages: ${JSON.stringify(context, null, 2)}`
-        : "";
+      : "";
 
-    return `
+   return `
 You are a helpful assistant for NMCI Business Group. 
 Your job is to classify a user message into one of three intents and generate an appropriate response.
 

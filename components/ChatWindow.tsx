@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -8,23 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-    Paperclip,
-    Smile,
     Send,
-    Mic,
+    Bot,
+    User,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import MarkdownRenderer from "./MarkdownRenderer";
+import { Metadata } from "@/types/metadata";
+import RenderMessageWithMetadata from "./RenderMessageWithMetadata";
 
 interface Message {
     id: string;
     role: "USER" | "ASSISTANT";
     content: string;
     chatSessionId: string;
-    metadata?: {
-        [key: string]: any;
-    };
+    metadata?: Metadata;
     createdAt: string;
 }
 
@@ -156,72 +155,128 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
     const messageGroups = groupMessagesByDate(messages);
 
     return (
-        <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-                <div className="space-y-4">
+            <ScrollArea className="flex-1 p-3 md:p-6" ref={scrollAreaRef}>
+                <div className="max-w-4xl mx-auto space-y-6">
                     {loading ? (
-                        <div className="flex justify-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                        <div className="flex flex-col items-center justify-center py-16">
+                            <div className="relative">
+                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
+                                <div className="animate-pulse absolute inset-0 rounded-full h-12 w-12 border-4 border-transparent border-t-blue-300"></div>
+                            </div>
+                            <p className="text-gray-500 dark:text-gray-400 mt-4 text-sm">Loading conversation...</p>
                         </div>
                     ) : messageGroups.length === 0 ? (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500 dark:text-gray-400">
-                                No messages yet. Start the conversation!
+                        <div className="flex flex-col items-center justify-center py-16 text-center">
+                            <div className="relative mb-6">
+                                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-full flex items-center justify-center">
+                                    <Bot className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full animate-pulse"></div>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                Ready to Help!
+                            </h3>
+                            <p className="text-gray-500 dark:text-gray-400 max-w-md">
+                                I'm your AI assistant. Ask me anything or start a conversation to get personalized help and insights.
                             </p>
                         </div>
                     ) : (
                         messageGroups.map((group, groupIndex) => (
-                            <div key={groupIndex}>
+                            <div key={groupIndex} className="space-y-4">
                                 {/* Date separator */}
-                                <div className="flex justify-center my-4">
-                                    <span className="bg-white dark:bg-gray-800 px-3 py-1 rounded-lg text-xs text-gray-500 dark:text-gray-400 shadow-sm">
-                                        {formatDate(group.date)}
-                                    </span>
+                                <div className="flex justify-center my-8">
+                                    <div className="bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700">
+                                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                            {formatDate(group.date)}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {/* Messages for this date */}
-                                {group.messages.map((message, index) => {
-                                    const isOwn = message.role === "USER";
-                                    return (
-                                        <div
-                                            key={message.id}
-                                            className={`flex ${isOwn ? "justify-end" : "justify-start"
-                                                } mb-2`}
-                                        >
+                                <div className="space-y-4">
+                                    {group.messages.map((message, index) => {
+                                        const isOwn = message.role === "USER";
+                                        return (
                                             <div
-                                                className={`flex items-end gap-2 max-w-xs lg:max-w-md ${isOwn ? "flex-row-reverse" : ""
-                                                    }`}
+                                                key={message.id}
+                                                className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
                                             >
                                                 <div
-                                                    className={`px-3 py-2 rounded-lg ${isOwn
-                                                        ? "bg-green-500 text-white"
-                                                        : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                                                    className={`flex items-start gap-3 max-w-[85%] sm:max-w-[75%] lg:max-w-[65%] ${isOwn ? "flex-row-reverse" : ""
                                                         }`}
                                                 >
-                                                    {!isOwn && (
-                                                        <p className="text-xs font-medium text-green-600 dark:text-green-400 mb-1">
-                                                            Assistant
-                                                        </p>
-                                                    )}
-                                                    <p className="text-sm break-words">
-                                                        <MarkdownRenderer content={message.content} />
-                                                    </p>
-                                                    <div
-                                                        className={`flex items-center justify-end gap-1 mt-1 ${isOwn
-                                                            ? "text-green-100"
-                                                            : "text-gray-500 dark:text-gray-400"
-                                                            }`}
-                                                    >
-                                                        <span className="text-xs">
-                                                            {formatTime(message.createdAt)}
-                                                        </span>
+                                                    {/* Avatar */}
+                                                    <div className={`flex-shrink-0 ${isOwn ? "ml-2" : "mr-2"}`}>
+                                                        <div
+                                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${isOwn
+                                                                ? "bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg"
+                                                                : "bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg"
+                                                                }`}
+                                                        >
+                                                            {isOwn ? <User size={16} /> : <Bot size={16} />}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Message bubble */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div
+                                                            className={`relative rounded-2xl px-4 py-3 shadow-sm ${isOwn
+                                                                ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white ml-8"
+                                                                : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 mr-8"
+                                                                }`}
+                                                        >
+                                                            {/* Assistant label */}
+                                                            {!isOwn && (
+                                                                <div className="flex items-center gap-2 mb-2">
+                                                                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                                                                        NMCI Assistant
+                                                                    </span>
+                                                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Message content */}
+                                                            <div className="prose dark:prose-invert max-w-none">
+                                                                {isOwn ? (
+                                                                    <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                                                        {message.content}
+                                                                    </div>
+                                                                ) : (
+                                                                    <RenderMessageWithMetadata
+                                                                        content={message.content}
+                                                                        metadata={message.metadata}
+                                                                    />
+                                                                )}
+                                                            </div>
+
+                                                            {/* Timestamp */}
+                                                            <div
+                                                                className={`flex items-center justify-end mt-2 ${isOwn
+                                                                    ? "text-blue-100"
+                                                                    : "text-gray-500 dark:text-gray-400"
+                                                                    }`}
+                                                            >
+                                                                <span className="text-xs opacity-75">
+                                                                    {formatTime(message.createdAt)}
+                                                                </span>
+                                                            </div>
+
+                                                            {/* Message tail */}
+                                                            <div
+                                                                className={`absolute top-4 w-0 h-0 ${isOwn
+                                                                    ? "-right-2 border-l-8 border-l-blue-500 border-t-4 border-t-transparent border-b-4 border-b-transparent"
+                                                                    : "-left-2 border-r-8 border-r-white dark:border-r-gray-800 border-t-4 border-t-transparent border-b-4 border-b-transparent"
+                                                                    }`}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
                             </div>
                         ))
                     )}
@@ -230,53 +285,30 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="p-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                <form onSubmit={sendMessage} className="flex items-center gap-2">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-gray-600 dark:text-gray-400"
-                    >
-                        <Paperclip className="h-5 w-5" />
-                    </Button>
+            <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div className="max-w-4xl mx-auto p-4">
+                    <form onSubmit={sendMessage} className="flex items-center gap-3">
+                        {/* Message input container */}
+                        <div className="flex-1 relative">
+                            <Input
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder="Ask me anything..."
+                                className="pr-12 py-3 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            />
+                        </div>
 
-                    <div className="flex-1 relative">
-                        <Input
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Type a message"
-                            className="pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600"
-                        />
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-1 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400"
-                        >
-                            <Smile className="h-4 w-4" />
-                        </Button>
-                    </div>
-
-                    {newMessage.trim() ? (
+                        {/* Send button */}
                         <Button
                             type="submit"
-                            size="icon"
-                            className="bg-green-500 hover:bg-green-600 text-white"
+                            disabled={!newMessage.trim()}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-2xl px-6 transition-all duration-200 disabled:cursor-not-allowed"
                         >
-                            <Send className="h-4 w-4" />
+                            <Send className="h-4 w-4 mr-2" />
+                            Send
                         </Button>
-                    ) : (
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-600 dark:text-gray-400"
-                        >
-                            <Mic className="h-5 w-5" />
-                        </Button>
-                    )}
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     );

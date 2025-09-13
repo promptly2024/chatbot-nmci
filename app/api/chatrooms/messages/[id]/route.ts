@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
             chatSessionId: result.sessionId,
             messages: result.messages,
             replyMessage: result.replyMessage,
+            metadata: result.metadata,
             message: "Message sent successfully",
         });
     } catch (err) {
