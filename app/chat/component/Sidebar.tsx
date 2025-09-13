@@ -83,7 +83,13 @@ export function AppSidebar({ chatSessions }: { chatSessions: ChatSession[] }) {
 
     const handleSearch = () => {
         // Implement your search logic here
-        toast.info('Search button clicked');
+        toast.info('Search button clicked', {
+            description: 'Search functionality is not implemented yet.',
+            duration: 4000,
+            action: {
+                label: 'OK', onClick: () => toast.dismiss(),
+            },
+        });
     };
 
     return (
@@ -120,7 +126,7 @@ export function AppSidebar({ chatSessions }: { chatSessions: ChatSession[] }) {
                         <span>New Chat</span>
                     </button>
                     <button
-                        className="flex items-center px-2 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-tertiary/80 transition ml-2"
+                        className="flex items-center px-2 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-tertiary/80 transition ml-2 cursor-pointer"
                         onClick={handleSearch}
                         aria-label="Search"
                     >
