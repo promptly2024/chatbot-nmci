@@ -25,6 +25,8 @@ interface Message {
     chatSessionId: string;
     metadata?: Metadata;
     createdAt: string;
+    isOptimistic?: boolean; // Flag for optimistic messages
+    isLoading?: boolean; // Flag for loading state
 }
 
 interface ChatWindowProps {
@@ -36,6 +38,7 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(chatroomId ? true : false);
+    const [isSending, setIsSending] = useState(false);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -77,14 +80,50 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
 
     const sendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim()) return;
+        if (!newMessage.trim() || isSending) return;
 
         const messageContent = newMessage.trim();
+        const tempUserMessageId = `temp-user-${Date.now()}`;
+        const tempAssistantMessageId = `temp-assistant-${Date.now()}`;
+        
         setNewMessage("");
+        setIsSending(true);
+
+        // Add user message immediately to UI
+        const optimisticUserMessage: Message = {
+            id: tempUserMessageId,
+            role: "USER",
+            content: messageContent,
+            chatSessionId: chatroomId ?? "12345678",
+            createdAt: new Date().toISOString(),
+            isOptimistic: true,
+        };
+
+        // Add optimistic user message
+        setMessages(prev => [...prev, optimisticUserMessage]);
+
+        // Add loading assistant message
+        const loadingAssistantMessage: Message = {
+            id: tempAssistantMessageId,
+            role: "ASSISTANT",
+            content: "Typing...",
+            chatSessionId: chatroomId ?? "12345678",
+            createdAt: new Date().toISOString(),
+            isOptimistic: true,
+            isLoading: true,
+        };
+
+        // Add assistant "typing" message after brief delay
+        setTimeout(() => {
+            setMessages(prev => [...prev, loadingAssistantMessage]);
+        }, 500);
 
         try {
             const response = await fetch(`/api/chatrooms/messages/${chatroomId ?? "12345678"}`, {
                 method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                     content: messageContent,
                     newChat,
@@ -92,21 +131,41 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
             });
 
             const data = await response.json();
+            
             if (response.ok) {
                 if (newChat && data.chatSessionId) {
                     router.push(`/chat/${data.chatSessionId}`);
                 }
-                setMessages((prev) => [...prev, data.messages, data.replyMessage]);
+                
+                // Remove optimistic messages and add real ones
+                setMessages(prev => {
+                    // Remove optimistic messages
+                    const withoutOptimistic = prev.filter(msg => !msg.isOptimistic);
+                    
+                    // Add real messages from server
+                    const serverMessages = [data.messages, data.replyMessage].filter(Boolean);
+                    return [...withoutOptimistic, ...serverMessages];
+                });
+                
             } else {
                 toast.error(data.message || "Failed to send message");
                 setNewMessage(messageContent);
+                
+                // Remove optimistic messages on error
+                setMessages(prev => prev.filter(msg => !msg.isOptimistic));
             }
         } catch (error) {
             toast.error("An error occurred while sending message");
             setNewMessage(messageContent);
+            
+            // Remove optimistic messages on error
+            setMessages(prev => prev.filter(msg => !msg.isOptimistic));
+        } finally {
+            setIsSending(false);
         }
     };
 
+    // Rest of your component code remains the same...
     const formatTime = (timestamp: string | Date) => {
         return new Date(timestamp).toLocaleTimeString("en-US", {
             hour: "numeric",
@@ -198,14 +257,16 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                 <div className="space-y-4">
                                     {group.messages.map((message, index) => {
                                         const isOwn = message.role === "USER";
+                                        const isOptimistic = message.isOptimistic;
+                                        const isLoadingMsg = message.isLoading;
+                                        
                                         return (
                                             <div
                                                 key={message.id}
                                                 className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
                                             >
                                                 <div
-                                                    className={`flex items-start gap-3 max-w-[85%] sm:max-w-[75%] lg:max-w-[65%] ${isOwn ? "flex-row-reverse" : ""
-                                                        }`}
+                                                    className={`flex items-start gap-3 max-w-[85%] sm:max-w-[75%] lg:max-w-[65%] ${isOwn ? "flex-row-reverse" : ""}`}
                                                 >
                                                     {/* Avatar */}
                                                     <div className={`flex-shrink-0 ${isOwn ? "ml-2" : "mr-2"}`}>
@@ -213,7 +274,7 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                                             className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${isOwn
                                                                 ? "bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg"
                                                                 : "bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg"
-                                                                }`}
+                                                                } ${isOptimistic ? "opacity-70" : ""}`}
                                                         >
                                                             {isOwn ? <User size={16} /> : <Bot size={16} />}
                                                         </div>
@@ -225,7 +286,7 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                                             className={`relative rounded-2xl px-4 py-3 shadow-sm ${isOwn
                                                                 ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white ml-8"
                                                                 : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 mr-8"
-                                                                }`}
+                                                                } ${isOptimistic ? "opacity-70" : ""}`}
                                                         >
                                                             {/* Assistant label */}
                                                             {!isOwn && (
@@ -233,7 +294,7 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                                                     <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
                                                                         NMCI Assistant
                                                                     </span>
-                                                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                                                    <div className={`w-2 h-2 rounded-full ${isLoadingMsg ? "bg-yellow-400 animate-pulse" : "bg-green-400 animate-pulse"}`}></div>
                                                                 </div>
                                                             )}
 
@@ -242,12 +303,28 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                                                 {isOwn ? (
                                                                     <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                                                                         {message.content}
+                                                                        {isOptimistic && (
+                                                                            <span className="ml-2 text-blue-200 text-xs">Sending...</span>
+                                                                        )}
                                                                     </div>
                                                                 ) : (
-                                                                    <RenderMessageWithMetadata
-                                                                        content={message.content}
-                                                                        metadata={message.metadata}
-                                                                    />
+                                                                    <div className="text-sm leading-relaxed">
+                                                                        {isLoadingMsg ? (
+                                                                            <div className="flex items-center gap-2">
+                                                                                <div className="flex gap-1">
+                                                                                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                                                                                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                                                                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                                                                </div>
+                                                                                <span className="text-gray-500 text-xs">AI is thinking...</span>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <RenderMessageWithMetadata
+                                                                                content={message.content}
+                                                                                metadata={message.metadata}
+                                                                            />
+                                                                        )}
+                                                                    </div>
                                                                 )}
                                                             </div>
 
@@ -294,18 +371,28 @@ export default function ChatWindow({ newChat, chatroomId }: ChatWindowProps) {
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
                                 placeholder="Ask me anything..."
-                                className="pr-12 py-3 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                disabled={isSending}
+                                className="pr-12 py-3 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
                             />
                         </div>
 
                         {/* Send button */}
                         <Button
                             type="submit"
-                            disabled={!newMessage.trim()}
+                            disabled={!newMessage.trim() || isSending}
                             className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 text-white rounded-2xl px-6 transition-all duration-200 disabled:cursor-not-allowed"
                         >
-                            <Send className="h-4 w-4 mr-2" />
-                            Send
+                            {isSending ? (
+                                <div className="flex items-center">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                                    Sending
+                                </div>
+                            ) : (
+                                <>
+                                    <Send className="h-4 w-4 mr-2" />
+                                    Send
+                                </>
+                            )}
                         </Button>
                     </form>
                 </div>
