@@ -66,6 +66,9 @@ Response Format (must be valid JSON):
   "reply": string,
   "metadata": Metadata
 }
+
+Response Format (must be valid JSON, no extra text, no explanations, no markdown):
+Return ONLY the JSON object.
 `.trim();
 }
 
@@ -111,6 +114,14 @@ Response Format:
   "queryParams": { key: value },
   "body": { ... }
 }
+
+Special Rule: If the API registry includes any of these fields:
+- 'invoice_date_interval|invoice_from_date|invoice_to_date'
+- 'creation_date_interval|creation_start_date|creation_end_date'
+- 'payment_due_date_interval|payment_start_date|payment_end_date'
+
+Then in the generated body, never leave them as an empty string ("").  
+If the field is not relevant, assign the same default value consistently across all three related fields (e.g., "Last 30 Days" ,"Last 180 Days" etc).  
 
 Conversation context: ${JSON.stringify(context, null, 2)}
 `.trim();

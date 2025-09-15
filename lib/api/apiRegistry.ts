@@ -61,7 +61,7 @@ export const API_REGISTRY = [
             },
             "invoice_date_interval|invoice_from_date|invoice_to_date": {
                 "type": "string",
-                // required: true,
+                // required: true, Can not be empty string 
                 "example": "Last 180 Days",
                 "description": "Invoice date filter interval",
                 "options": [
@@ -72,7 +72,7 @@ export const API_REGISTRY = [
             },
             "creation_date_interval|creation_start_date|creation_end_date": {
                 "type": "string",
-                // required: true,
+                // required: true, Can not be empty string // default All
                 "example": "Last 180 Days",
                 "description": "Creation date filter interval",
                 "options": [
@@ -83,7 +83,7 @@ export const API_REGISTRY = [
             },
             "payment_due_date_interval|payment_start_date|payment_end_date": {
                 "type": "string",
-                // required: true,
+                // required: true, Can not be empty string
                 "example": "All",
                 "description": "Payment due date filter interval"
             },

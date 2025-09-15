@@ -74,7 +74,7 @@ export async function callApiFromRegistry(apiData: ApiData, content: string) {
         }
         const data = await res.clone().json();
         // console.log("\n\nAPI Response Data:", JSON.stringify(data, null, 2));
-        return JSON.stringify(data, null, 2);
+        return JSON.stringify(data.data.results, null, 2);
     } catch (error) {
         console.error("Error calling API:", error);
         throw error;
@@ -92,5 +92,6 @@ export async function buildFinalResponse(apiResponse: string, apiData: ApiData, 
         console.error("Failed to parse GEMINI response:", err, text);
         geminiData = { reply: text, metadata: {} as Metadata };
     }
+    console.log("\n\nGEMINI Final Response:", JSON.stringify(geminiData, null, 2));
     return geminiData;
 }
