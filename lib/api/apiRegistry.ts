@@ -885,7 +885,7 @@ export const API_REGISTRY = [
         ]
     },
     {
-        // Prompt: "Generates Account Receivable report with detailed invoice data, payment status, and outstanding balances for last 7 days"
+        // Prompt: "Generates Account Receivable report with detailed invoice data, payment status, and outstanding balances for last 7 days and payment date is also 7 days"
         "name": "generateAccountReceivableReport",
         "description": "Generates Account Receivable report with detailed invoice data, payment status, and outstanding balances",
         "method": "POST",
