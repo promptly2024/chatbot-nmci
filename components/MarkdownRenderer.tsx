@@ -1,7 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
-import type { ReactNode, HTMLAttributes, LiHTMLAttributes, AnchorHTMLAttributes, ImgHTMLAttributes } from "react";
+import type { ReactNode, HTMLAttributes, LiHTMLAttributes, AnchorHTMLAttributes } from "react";
 
 type MarkdownRendererProps = {
     content: string;

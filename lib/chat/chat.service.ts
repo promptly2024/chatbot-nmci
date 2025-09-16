@@ -70,7 +70,7 @@ export const ChatService = {
 
             if (apiData) {
                 console.log("\n\nSelected API Data:", apiData);
-                const apiResponse = await callApiFromRegistry(apiData, content) as string;
+                const apiResponse = await callApiFromRegistry(apiData) as string;
                 console.log("API Call Reply Content:", apiResponse);
 
                 const finalResponse: { reply: string, metadata: Metadata } = await buildFinalResponse(apiResponse, apiData, content);

@@ -17,7 +17,7 @@ export type ApiData = {
 const BASE_URL = "https://be.letstranzact.com";
 const REPORTING_URL = "https://reporting.letstranzact.com";
 
-export async function callApiFromRegistry(apiData: ApiData, content: string) {
+export async function callApiFromRegistry(apiData: ApiData) {
     if (!apiData) return "No API data provided.";
 
     // Replace path params in endpoint

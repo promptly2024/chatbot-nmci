@@ -1,15 +1,14 @@
-/* eslint-disable @next/next/no-async-client-component */
-// "use client";
 import ChatWindow from '@/components/ChatWindow';
 import React from 'react'
 
-const ChatId = async ({ params }: { params: { id: string } }) => {
-    const awaitedParams = await params;
-    const chatId = awaitedParams.id;
+type PageProps = {
+    params: Promise<{ id: string }>
+}
+
+const ChatId = async ({ params }: PageProps) => {
+    const { id: chatId } = await params;
     return (
-        // <div className='h-screen'>
-            <ChatWindow newChat={false} chatroomId={chatId} />
-        // </div>
+        <ChatWindow newChat={false} chatroomId={chatId} />
     )
 }
 
