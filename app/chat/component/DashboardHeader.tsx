@@ -22,6 +22,12 @@ interface ChatSession {
     updatedAt: string;
 }
 
+type BreadcrumbItemType = {
+    name: string;
+    path: string;
+    isLast: boolean;
+};
+
 export function DashboardHeader({ chatSessions }: { chatSessions: ChatSession[] }) {
     const pathname = usePathname();
 
@@ -34,7 +40,7 @@ export function DashboardHeader({ chatSessions }: { chatSessions: ChatSession[] 
     // Generate breadcrumbs based on current path
     const generateBreadcrumbs = () => {
         const paths = pathname.split('/').filter(Boolean);
-        const breadcrumbs = [];
+        const breadcrumbs: BreadcrumbItemType[] = [];
 
         for (let i = 0; i < paths.length; i++) {
             const path = '/' + paths.slice(0, i + 1).join('/');
