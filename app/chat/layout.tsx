@@ -4,12 +4,13 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from './component/Sidebar';
 import { DashboardHeader } from './component/DashboardHeader';
 import prisma from '@/lib/db';
+import { ChatSession } from '@prisma/client';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
 }
 
-const getChatSession = async () => {
+const getChatSession = async (): Promise<ChatSession[]> => {
     const chatSessions = await prisma.chatSession.findMany({
         orderBy: {
             createdAt: 'desc',
