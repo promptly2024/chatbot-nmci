@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/chat/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { ChatService } from "@/lib/chat/chat.service";
