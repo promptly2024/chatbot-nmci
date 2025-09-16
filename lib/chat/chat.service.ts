@@ -1,10 +1,10 @@
 // lib/chat/chat.service.ts
 import { generateGeminiResponse } from "@/utils/generateGeminiResponse";
 import { ChatRepository } from "./chat.repository";
-import { GeminiResponse } from "@/app/api/chatrooms/route";
 import { buildApiSelectionPrompt, buildClassificationPrompt } from "../prompt";
 import { ApiData, buildFinalResponse, callApiFromRegistry } from "../api/callApiFromRegistry";
 import { Metadata } from "@/types/metadata";
+import { GeminiResponse } from "./chat.types";
 
 export const ChatService = {
     async fetchMessages(chatSessionId: string) {
