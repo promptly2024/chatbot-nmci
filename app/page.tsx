@@ -17,6 +17,7 @@ type UserType = {
 const HomePage = () => {
   const [user, setUser] = React.useState<UserType>(null);
   const { data: session, status } = useSession();
+  console.log(session);
   const router = useRouter();
   React.useEffect(() => {
     if (session) {
@@ -55,6 +56,12 @@ const HomePage = () => {
             className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded shadow transition mb-2"
           >
             Go to Chat
+          </button>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow transition mb-2"
+          >
+            Dashboard
           </button>
         </>
       )}
